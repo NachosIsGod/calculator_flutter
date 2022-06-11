@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutterproject/components/rect_button.dart';
 import 'package:flutterproject/components/icon_button.dart';
@@ -18,17 +20,8 @@ class MyApp extends StatefulWidget {
 class _MyApp extends State<StatefulWidget> {
 
   String displayText = '0';
-
-  //double? num1;
-  //double? num2;
-  double? answer = 0;
-  int ASMD = 0;
-  bool delete = true;
-
-  int leftNum1 = 0;
-  int rightNum1 = 0;
-  int leftNum2 = 0;
-  int rightNum2 = 0;
+  String result = '';
+  String operator = '0';
 
   _MyApp();
 
@@ -104,7 +97,7 @@ class _MyApp extends State<StatefulWidget> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        createButton('.',false),
+                        createDotButton(),
                         createButton('0',true),
                         createOperatorButton('='),
                         createOperatorButton('÷')
@@ -127,10 +120,27 @@ class _MyApp extends State<StatefulWidget> {
 
         //画面変更するときはsetStateで囲う
         setState(() {
-          if(delete) displayText = '';
+
+
+          if(displayText == '0') displayText = '';
           displayText += name;
-          if(displayText == '.')displayText = '0.';
-          if(displayText != '0')delete = false;
+        });
+      }),
+    );
+  }
+
+  Widget createDotButton(){
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: RectButton('.', false, (){
+        print('やっほー  .');
+
+        //画面変更するときはsetStateで囲う
+        setState(() {
+          if(!displayText.contains('.')) {
+            displayText += '.';
+            if (displayText == '.') displayText = '0.';
+          }
         });
       }),
     );
@@ -144,15 +154,11 @@ class _MyApp extends State<StatefulWidget> {
 
         //画面変更するときはsetStateで囲う
         setState(() {
-          leftNum1 = 0;
-          leftNum2 = 0;
-          rightNum1 = 0;
-          rightNum2 = 0;
-          answer = null;
           displayText = '0';
-          ASMD = 0;
-          delete = true;
+          result = '';
+          operator = '0';
         });
+
       }),
     );
   }
@@ -189,96 +195,6 @@ class _MyApp extends State<StatefulWidget> {
     );
   }
 
-  Widget createOperatorButton(String name) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: RectButton(name, false, (){
-        print('やっほー  $name');
-
-        //画面変更するときはsetStateで囲う
-        setState(() {
-          if(name == '+'){
-            if(ASMD == 0) {
-              int index = displayText.indexOf('.');
-              if(index != -1) {
-                leftNum1 = int.parse(displayText.substring(0, index));
-                rightNum1 = int.parse(displayText.substring(index+1));
-              }
-              else{
-                leftNum1 = int.parse(displayText);
-                rightNum1 = 0;
-              }
-
-              ASMD = 1;
-              delete = true;
-            }else{
-              equal(1);
-            }
-
-          }else if(name == '-'){
-            if(ASMD == 0) {
-              int index = displayText.indexOf('.');
-              if(index != -1) {
-                leftNum1 = int.parse(displayText.substring(0, index));
-                rightNum1 = int.parse(displayText.substring(index+1));
-              }
-              else{
-                leftNum1 = int.parse(displayText);
-                rightNum1 = 0;
-              }
-
-              ASMD = 2;
-              delete = true;
-            }else{
-              equal(2);
-            }
-
-          }else if(name == '×'){
-            if(ASMD == 0) {
-              int index = displayText.indexOf('.');
-              if(index != -1) {
-                leftNum1 = int.parse(displayText.substring(0, index));
-                rightNum1 = int.parse(displayText.substring(index+1));
-              }
-              else{
-                leftNum1 = int.parse(displayText);
-                rightNum1 = 0;
-              }
-
-              ASMD = 3;
-              delete = true;
-            }else{
-              equal(3);
-            }
-
-          }else if(name == '÷'){
-            if(ASMD == 0) {
-              int index = displayText.indexOf('.');
-              if(index != -1) {
-                leftNum1 = int.parse(displayText.substring(0, index));
-                rightNum1 = int.parse(displayText.substring(index+1));
-              }
-              else{
-                leftNum1 = int.parse(displayText);
-                rightNum1 = 0;
-              }
-
-              ASMD = 4;
-              delete = true;
-            }else{
-              equal(4);
-            }
-
-          }else if(name == '='){
-            equal(0);
-            ASMD = 0;
-          }
-
-        });
-      }),
-    );
-  }
-
   Widget createExponentiationButton() {
     return Padding(
       padding: const EdgeInsets.all(4.0),
@@ -293,38 +209,102 @@ class _MyApp extends State<StatefulWidget> {
     );
   }
 
-  void equal(int asmd) {
-    leftNum2 = int.parse(displayText.substring(0, dotPos(displayText)));
-    rightNum2 = int.parse(displayText.substring(dotPos(displayText) +1, displayText.length));
-    print('dot');
-    print('left1 = $leftNum1');
-    print('left2 = $leftNum2');
-    print('right1 = $rightNum1');
-    print('right2 = $rightNum2');
+  Widget createOperatorButton(String name) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: RectButton(name, false, (){
+        print('やっほー  $name');
 
-    if(ASMD == 1)displayText = (leftNum1 + leftNum2).toString() + '.' + (rightNum1 + rightNum2).toString();
-    if(ASMD == 2)displayText = (leftNum1 - leftNum2).toString() + '.' + (rightNum1 - rightNum2).toString();
-    if(ASMD == 3)displayText = (leftNum1 * leftNum2).toString() + '.' + (rightNum1 * rightNum2).toString();
-    if(ASMD == 4)displayText = (leftNum1 / leftNum2).toString() + '.' + (rightNum1 / rightNum2).toString();
-    leftNum1 = int.parse(displayText.substring(0, dotPos(displayText)));
-    rightNum1 = int.parse(displayText.substring(dotPos(displayText) +1, displayText.length));
+        //画面変更するときはsetStateで囲う
+        setState(() {
+          if(name == '+'){
+            result = result.isNotEmpty? calculate(result, operator, displayText): displayText;
+            operator = '+';
+            displayText = '';
 
-    answer = double.parse(displayText);
-    leftNum2 = 0;
-    rightNum2 = 0;
-    delete = true;
-    ASMD = asmd;
+          }else if(name == '-'){
+            result = result.isNotEmpty? calculate(result, operator, displayText): displayText;
+            operator = '+';
+            displayText = '';
+
+          }else if(name == '×'){
+            result = result.isNotEmpty? calculate(result, operator, displayText): displayText;
+            operator = '+';
+            displayText = '';
+
+          }else if(name == '÷'){
+            result = result.isNotEmpty? calculate(result, operator, displayText): displayText;
+            operator = '+';
+            displayText = '';
+
+          }else if(name == '='){
+            result = result.isNotEmpty? calculate(result, operator, displayText): displayText;
+            operator = '=';
+            displayText = '';
+          }else {
+            displayText = result;
+          }
+
+        });
+      }),
+    );
   }
+}
 
-  int dotPos(String text) {
-    int pos = text.indexOf('.');
-    print ('pos = $pos');
-    if(pos != -1){
-      return(pos);
-    }else{
-      return(0);
+String calculate(String left, String op, String right) {
+
+  String fl = left.contains('.')? (left.substring(left.indexOf('.')+1, left.length)): '0'; //右に点が無いときの処理
+  String fr = right.contains('.')? (right.substring(right.indexOf('.')+1, right.length)): '0'; //右に点が無いときの処理
+
+  print ('fl1 =' + fl);
+  print ('fr1 =' + fr);
+
+  //桁数合わせ
+  if(fl.length < fr.length){
+    while(fl.length != fr.length){
+      fl += '0';
+    }
+  }else if(fl.length > fr.length){
+    while(fl.length != fr.length){
+      fr += '0';
     }
   }
 
+  print ('fl2 =' + fl);
+  print ('fr2 =' + fr);
 
+
+  int il = left.contains('.')? int.parse(left.substring(0, left.indexOf('.'))): int.parse(left);
+  int ir = right.contains('.')? int.parse(right.substring(0, right.indexOf('.'))): int.parse(right);
+
+  print ('il =' + il.toString());
+  print ('ir =' + ir.toString());
+
+
+  //少数の桁
+  int l = fl.length;
+  int len = 1;
+  for(int i=0; i<l; i++){
+    len *= 10;
+  }
+
+  int f = 0;
+  int i = 0;
+  if(op == '+') {
+    f = int.parse(fl) + int.parse(fr);
+    i = il + ir + f ~/ len;
+
+  }
+  if(op == '-') {
+
+  }
+  if(op == '×') {
+
+  }
+  if(op == '÷') {
+
+  }
+
+  print( f==0? i.toString() : i.toString() + '.' + f.toString());
+  return f==0? i.toString() : i.toString() + '.' + f.toString();
 }
