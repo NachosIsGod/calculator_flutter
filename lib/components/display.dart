@@ -1,17 +1,19 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class Display extends StatelessWidget{
+class Display extends StatefulWidget {
+  Display({Key? key}) : super(key: key);
 
-  String text;
+  @override
+  DisplayState createState() => DisplayState();
+}
 
-  Display(this.text);
+class DisplayState extends State<Display> {
+  String displayText = "";
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-
       width: double.infinity,
       child: Container(
         decoration: BoxDecoration(
@@ -19,7 +21,7 @@ class Display extends StatelessWidget{
           border: Border.all(color: Colors.white12),
         ),
         child: Text(
-          text,
+          displayText,
           textAlign: TextAlign.right,
           style: const TextStyle(fontSize: 48),
           maxLines: 1,
@@ -27,5 +29,4 @@ class Display extends StatelessWidget{
       ),
     );
   }
-
 }
